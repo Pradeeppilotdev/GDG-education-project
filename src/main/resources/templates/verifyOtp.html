@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>OTP Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-size: cover;
+      background-attachment: fixed;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+
+    input:focus {
+      border-color: #6a11cb;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.15);
+    }
+
+    input[readonly] {
+      background-color: #f8f9fa;
+      color: #6c757d;
+    }
+
+    button {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(106, 17, 203, 0.2);
+      width: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 14px rgba(106, 17, 203, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Background animated shapes */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .shape:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: -150px;
+      left: -100px;
+    }
+
+    .shape:nth-child(2) {
+      width: 300px;
+      height: 300px;
+      bottom: -100px;
+      right: -50px;
+    }
+
+    .shape:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      bottom: 50%;
+      left: 30%;
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+<div class="background">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
+<div class="container">
+  <h2>Verify Your Account</h2>
+
+  <form method="POST" action="/auth/ver">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" th:value="${param.email}" readonly required>
+
+      <label for="otp">OTP:</label>
+      <input type="text" id="otp" name="otp" placeholder="Enter verification code" required>
+
+      <button id="b" type="submit">Verify OTP</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#b").click(function(e) {
+      e.preventDefault();
+      window.location.href = "/auth/login";
+    });
+  });
+</script>
+</body>
+</html>

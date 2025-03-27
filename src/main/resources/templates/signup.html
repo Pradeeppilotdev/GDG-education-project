@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Signup Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Animated background elements */
+        .bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.2;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .bg-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -150px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-element:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: -200px;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .bg-element:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: #f472b6;
+            top: 30%;
+            right: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1);
+            }
+        }
+
+        .container-fluid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(79, 70, 229, 0.8) 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .left-panel {
+                display: flex;
+            }
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/img/robot.jpeg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            mix-blend-mode: overlay;
+        }
+
+        .brand {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .brand h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+        }
+
+        .brand p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+        }
+
+        .features {
+            position: relative;
+            margin-top: auto;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+        }
+
+        .feature-text p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .greeting-container {
+            margin-bottom: 30px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-height: 40px;
+            position: relative;
+        }
+
+        /* Cursor for typing effect */
+        .greeting-container::after {
+            content: "";
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 70%;
+            width: 3px;
+            background-color: var(--primary);
+            animation: blink 0.8s infinite;
+        }
+
+        /* Hide cursor after typing is complete */
+        .greeting-container.typing-complete::after {
+            display: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .signup-container h2 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .form-floating {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-floating input {
+            height: 60px;
+            background-color: #ffffff;
+            border: 2px solid #4A90E2;
+            border-radius: 12px;
+            color: #333333;
+            padding: 15px 20px;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-floating input:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.25);
+        }
+
+        .form-floating label {
+            color: #666666;
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            transition: all 0.3s;
+            padding: 0;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            top: 5px;
+            font-size: 0.9rem;
+            color: #4A90E2;
+        }
+
+        .submit-btn {
+            height: 56px;
+            border-radius: 12px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s;
+            z-index: -1;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-link {
+            margin-top: 25px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: var(--primary-light);
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            z-index: 10;
+            background: transparent;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .password-toggle:hover {
+            color: #4A90E2;
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-elements">
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+</div>
+
+<div class="container-fluid">
+    <div class="content-wrapper">
+        <div class="left-panel">
+            <div class="brand">
+                <h1>EduFuture</h1>
+                <p>Where learning meets innovation</p>
+            </div>
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Expert-Led Courses</h4>
+                        <p>Learn from industry professionals and acclaimed educators</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Recognized Certificates</h4>
+                        <p>Earn credentials valued by top employers worldwide</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Vibrant Community</h4>
+                        <p>Connect with peers and mentors on your learning journey</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="greeting-container" id="greeting"></div>
+
+            <div class="signup-container">
+                <h2>Create your account</h2>
+                <form th:action="@{/auth/signup}" method="post">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                        <label for="username">Username</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email">Email address</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <label for="password">Password</label>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <i class="fas fa-eye" id="password-icon"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+                        <label for="confirmPassword">Confirm Password</label>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye" id="confirmPassword-icon"></i>
+                        </button>
+                    </div>
+
+                    <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+                    <button type="submit" class="btn submit-btn w-100">Join Now</button>
+
+                    <div class="login-link">
+                        Already have an account? <a href="http://localhost:8080/auth/login">Sign in</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Typing effect for greeting
+    const greetingText = "🔑 Education is the Key to Your Future! Register now and open new doors.";
+    let index = 0;
+
+    function typeGreeting() {
+        if (index < greetingText.length) {
+            document.getElementById("greeting").textContent += greetingText.charAt(index);
+            index++;
+            setTimeout(typeGreeting, 50);
+        } else {
+            // Remove the cursor after typing is complete
+            document.querySelector(".greeting-container").classList.add("typing-complete");
+        }
+    }
+
+    // Password visibility toggle
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + '-icon');
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+
+    window.onload = function() {
+        typeGreeting();
+    };
+</script>
+
+</body>
+</html>

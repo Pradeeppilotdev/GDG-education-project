@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Search Educational Videos</title>
+</head>
+<body>
+<section>
+    <h2 class="mb-4">Search Educational Videos</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/videos/search}" th:object="${searchRequest}" method="post">
+                <div class="mb-3">
+                    <label for="query" class="form-label">Search Keywords</label>
+                    <input type="text" class="form-control" id="query" th:field="*{query}"
+                           placeholder="Enter keywords (e.g., calculus, physics, history)" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" th:field="*{category}">
+                            <option value="">All Categories</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Science">Science</option>
+                            <option value="History">History</option>
+                            <option value="Language">Language</option>
+                            <option value="Programming">Programming</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="maxResults" class="form-label">Max Results</label>
+                        <select class="form-select" id="maxResults" th:field="*{maxResults}">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Search Videos</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card bg-light">
+        <div class="card-body">
+            <h5 class="card-title">Search Tips</h5>
+            <ul class="mb-0">
+                <li>Use specific keywords for better results</li>
+                <li>Include educational terms like "tutorial", "lecture", or "lesson"</li>
+                <li>Select a category to narrow down your search</li>
+                <li>The platform will automatically prioritize educational content</li>
+            </ul>
+        </div>
+    </div>
+</section>
+</body>
+</html>

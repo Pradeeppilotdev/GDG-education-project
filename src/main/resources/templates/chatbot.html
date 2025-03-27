@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Voice Learning Chatbot</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6a1b9a;
+      --secondary-color: #9c27b0;
+      --accent-color: #ff4081;
+      --background-dark: #121212;
+      --surface-dark: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --gradient-primary: linear-gradient(135deg, #6a1b9a 0%, #9c27b0 100%);
+      --gradient-accent: linear-gradient(135deg, #ff4081 0%, #f50057 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: var(--secondary-color) transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: var(--background-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .app-container {
+      max-width: 900px;
+      height: 95vh;
+      margin: 2vh auto;
+      display: flex;
+      background-color: var(--surface-dark);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    }
+
+    .sidebar {
+      width: 80px;
+      background: var(--gradient-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar:hover {
+      width: 250px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 15px;
+      color: var(--text-primary);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-item:hover {
+      background-color: rgba(255,255,255,0.1);
+      opacity: 1;
+    }
+
+    .sidebar-item i {
+      margin-right: 15px;
+      font-size: 20px;
+    }
+
+    .sidebar-item span {
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar:hover .sidebar-item span {
+      opacity: 1;
+    }
+
+    .chat-section {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .voice-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .voice-btn {
+      background: var(--gradient-accent);
+      color: var(--text-primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .voice-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .voice-btn.recording {
+      animation: pulse 1.5s infinite;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question, .answer {
+      max-width: 80%;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 15px;
+      position: relative;
+    }
+
+    .question {
+      align-self: flex-end;
+      background: var(--gradient-primary);
+      color: var(--text-primary);
+      margin-left: auto;
+    }
+
+    .answer {
+      align-self: flex-start;
+      background-color: rgba(255,255,255,0.1);
+      color: var(--text-secondary);
+    }
+
+    .answer .play-btn {
+      background: var(--gradient-accent);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    .point-list {
+      margin: 10px 0 0 20px;
+      color: var(--text-secondary);
+    }
+
+    .point-list li {
+      margin-bottom: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-input {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.05);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-input input {
+      flex-grow: 1;
+      background-color: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text-primary);
+      padding: 12px 20px;
+      border-radius: 50px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .chat-input input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(255,64,129,0.2);
+    }
+
+    .chat-input button {
+      background: var(--gradient-accent);
+      color: var(--text-primary);
+      border: none;
+      padding: 12px 25px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .chat-input button:hover {
+      transform: scale(1.05);
+    }
+
+    .speech-status {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      text-align: center;
+      padding: 5px;
+      visibility: hidden;
+    }
+
+    .speech-status.active {
+      visibility: visible;
+    }
+
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .audio-controls button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--accent-color);
+      font-size: 1.2rem;
+      padding: 5px;
+    }
+
+    .speed-control {
+      margin-left: 10px;
+      display: flex;
+      align-items: center;
+      color: var(--text-secondary);
+    }
+
+    .speed-control select {
+      margin-left: 5px;
+      padding: 2px 5px;
+      background-color: rgba(255,255,255,0.1);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+
+    .learning-mode-toggle {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    .learning-mode-toggle label {
+      display: flex;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="sidebar">
+    <a id="h" th:href="@{/auth/home}" class="sidebar-item">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </a>
+    <a id="l" th:href="@{/auth/login}" class="sidebar-item">
+      <i class="fas fa-sign-in-alt"></i>
+      <span>Login</span>
+    </a>
+  </div>
+
+  <div class="chat-section">
+    <div class="chat-header">
+      <h2>Voice Learning Assistant</h2>
+      <button id="settings-btn" title="Settings">
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+
+    <div class="voice-controls">
+      <button id="listen-btn" class="voice-btn listen-btn">
+        <i class="fas fa-headphones"></i> Listen to All
+      </button>
+      <button id="voice-input-btn" class="voice-btn voice-input-btn">
+        <i class="fas fa-microphone"></i> Voice Input
+      </button>
+    </div>
+
+    <div class="learning-mode-toggle">
+      <label>
+        <input type="checkbox" id="voice-learning-mode" checked>
+        Voice Learning Mode
+      </label>
+    </div>
+
+    <div id="speech-status" class="speech-status">Listening...</div>
+
+    <div class="chat-box">
+      <div class="question" th:if="${question != null and question != ''}">
+        <strong>You:</strong> <span th:text="${question}"></span>
+      </div>
+      <div class="answer" th:if="${answer != null and answer != ''}">
+        <strong>Bot:</strong>
+        <button class="play-btn" onclick="speakText(this.parentElement.textContent.replace('Bot:', ''))">
+          <i class="fas fa-play"></i>
+        </button>
+
+        <ul class="point-list" th:if="${answer.contains('|')}">
+          <li th:each="point : ${#strings.arraySplit(answer, '|')}">
+            <span th:text="${point}"></span>
+            <button class="play-btn" onclick="speakText(this.previousElementSibling.textContent)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+        </ul>
+        <p th:if="${!answer.contains('|')}" th:text="${answer}"></p>
+
+        <div class="audio-controls">
+          <button id="pause-resume-btn" style="display: none;">
+            <i class="fas fa-pause"></i>
+          </button>
+          <button id="stop-btn" style="display: none;">
+            <i class="fas fa-stop"></i>
+          </button>
+          <div class="speed-control">
+            <label for="speech-rate">Speed:</label>
+            <select id="speech-rate">
+              <option value="0.8">Slow</option>
+              <option value="1" selected>Normal</option>
+              <option value="1.25">Fast</option>
+              <option value="1.5">Very Fast</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form class="chat-input" method="post" action="/auth/chatbot/ask">
+      <input type="text" id="question" name="question" placeholder="Ask me anything or press the mic button..." required>
+      <button type="submit">Send</button>
+    </form>
+    <button id="v">Go To Video Learning</button>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $("#h").click(function(e) {
+          e.preventDefault();
+          window.location.href = "/auth/home";
+      });
+
+      $("#l").click(function(e) {
+          e.preventDefault();
+          window.location.href = "/auth/login";
+      });
+
+      // Voice learning mode toggle
+      $("#voice-learning-mode").change(function() {
+          // Send request to backend to toggle voice learning mode
+          $.post("/auth/chatbot/toggle-voice-mode", {
+              voiceMode: this.checked
+          });
+      });
+
+      // Initialize speech recognition
+      initSpeechRecognition();
+
+      // Initialize text-to-speech
+      initTextToSpeech();
+
+      // Listen to all button
+      $("#listen-btn").click(function() {
+          // Find all answers and read them in sequence
+          const answers = document.querySelectorAll('.answer');
+          if (answers.length > 0) {
+              let fullText = '';
+              answers.forEach(answer => {
+                  fullText += answer.textContent.replace('Bot:', '') + ' ';
+              });
+              speakText(fullText);
+          } else {
+              speakText("There are no learning materials to read yet. Please ask a question first.");
+          }
+      });
+  });
+
+  // Speech recognition variables
+  let recognition;
+  let isRecording = false;
+
+  // Speech synthesis variables
+  let speechSynthesis = window.speechSynthesis;
+  let currentUtterance = null;
+
+  function initSpeechRecognition() {
+      // Check if browser supports speech recognition
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+          // Create speech recognition instance
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SpeechRecognition();
+
+          // Configure speech recognition
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US'; // Set language
+
+          // Speech recognition event handlers
+          recognition.onstart = function() {
+              isRecording = true;
+              $("#voice-input-btn").addClass("recording");
+              $("#speech-status").addClass("active").text("Listening...");
+          };
+
+          recognition.onresult = function(event) {
+              const transcript = event.results[0][0].transcript;
+              $("#question").val(transcript);
+              $("#speech-status").text("Recognized: " + transcript);
+          };
+
+          recognition.onerror = function(event) {
+              console.error("Speech recognition error", event.error);
+              $("#speech-status").text("Error: " + event.error);
+              stopRecording();
+          };
+
+          recognition.onend = function() {
+              if (isRecording) {
+                  // If we have a valid transcript, submit the form
+                  if ($("#question").val().trim() !== "") {
+                      setTimeout(function() {
+                          $(".chat-input form").submit();
+                      }, 500);
+                  }
+                  stopRecording();
+              }
+          };
+
+          // Set up voice input button
+          $("#voice-input-btn").click(toggleRecording);
+      } else {
+          // Browser doesn't support speech recognition
+          $("#voice-input-btn").prop("disabled", true)
+              .text("Voice Input Not Supported")
+              .css("background-color", "#ccc");
+      }
+  }
+
+  function toggleRecording() {
+      if (isRecording) {
+          stopRecording();
+      } else {
+          startRecording();
+      }
+  }
+
+  function startRecording() {
+      try {
+          recognition.start();
+      } catch (e) {
+          console.error("Could not start recording", e);
+      }
+  }
+
+  function stopRecording() {
+      isRecording = false;
+      $("#voice-input-btn").removeClass("recording");
+      $("#speech-status").removeClass("active");
+      try {
+          recognition.stop();
+      } catch (e) {
+          console.error("Error stopping recording", e);
+      }
+  }
+
+  function initTextToSpeech() {
+      // Check if browser supports speech synthesis
+      if ('speechSynthesis' in window) {
+          // Set up speech rate change handler
+          $("#speech-rate").change(function() {
+              if (currentUtterance) {
+                  currentUtterance.rate = parseFloat(this.value);
+              }
+          });
+
+          // Set up pause/resume button
+          $("#pause-resume-btn").click(function() {
+              if (speechSynthesis.paused) {
+                  speechSynthesis.resume();
+                  $(this).html('<i class="fas fa-pause"></i>');
+              } else {
+                  speechSynthesis.pause();
+                  $(this).html('<i class="fas fa-play"></i>');
+              }
+          });
+
+          // Set up stop button
+          $("#stop-btn").click(function() {
+              speechSynthesis.cancel();
+              resetSpeechControls();
+          });
+      } else {
+          // Browser doesn't support speech synthesis
+          $(".play-btn").prop("disabled", true).hide();
+          $("#listen-btn").prop("disabled", true)
+              .text("Text-to-Speech Not Supported")
+              .css("background-color", "#ccc");
+      }
+  }
+
+  function speakText(text) {
+      // Stop any current speech
+      speechSynthesis.cancel();
+
+      // Create a new utterance
+      currentUtterance = new SpeechSynthesisUtterance(text);
+
+      // Set properties
+      currentUtterance.lang = 'en-US';
+      currentUtterance.rate = parseFloat($("#speech-rate").val());
+      currentUtterance.pitch = 1;
+
+      // Set event handlers
+      currentUtterance.onstart = function() {
+          // Show audio controls
+          $("#pause-resume-btn, #stop-btn").show();
+      };
+
+      currentUtterance.onend = function() {
+          resetSpeechControls();
+      };
+
+      currentUtterance.onerror = function(event) {
+          console.error("Speech synthesis error", event);
+          resetSpeechControls();
+      };
+
+      // Start speaking
+      speechSynthesis.speak(currentUtterance);
+  }
+
+  function resetSpeechControls() {
+      $("#pause-resume-btn, #stop-btn").hide();
+      $("#pause-resume-btn").html('<i class="fas fa-pause"></i>');
+      currentUtterance = null;
+  }
+
+  // Video learning navigation
+  $("#v").click(function(e) {
+      e.preventDefault();
+      window.location.href = "http://localhost:8080/videos/search";
+  });
+</script>
+</body>
+</html>

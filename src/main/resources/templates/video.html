@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="${video.title}">Watch Video</title>
+</head>
+<body>
+<section>
+    <div class="mb-4">
+        <a href="/videos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Videos
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0" th:text="${video.title}">Video Title</h3>
+            <a th:href="@{/videos/toggle-favorite/{id}(id=${video.id})}" class="btn btn-outline-warning">
+                <i class="bi" th:classappend="${video.favorite} ? 'bi-star-fill' : 'bi-star'"></i>
+                <span th:text="${video.favorite} ? 'Remove from Favorites' : 'Add to Favorites'">Favorite</span>
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="ratio ratio-16x9 mb-4">
+                <iframe th:src="'https://www.youtube.com/embed/' + ${video.youtubeId}"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+
+            <div class="mb-3">
+                <span class="badge bg-primary" th:text="${video.category}">Category</span>
+            </div>
+
+            <h5>Description</h5>
+            <p th:text="${video.description}">Video description...</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows="4" placeholder="Take notes while watching the video..."></textarea>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <button class="btn btn-primary" disabled>Save Notes</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+  <title>Favorite Videos</title>
+</head>
+<body>
+<section>
+  <h2 class="mb-4">My Favorite Videos</h2>
+
+  <div class="alert alert-info" th:if="${videos.empty}">
+    <p>You haven't marked any videos as favorites yet.</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" th:if="${!videos.empty}">
+    <div class="col" th:each="video : ${videos}">
+      <div class="card video-card h-100">
+        <div class="thumbnail-container">
+          <img th:src="${video.thumbnailUrl}" class="card-img-top" alt="Video Thumbnail">
+          <span class="badge bg-primary category-badge" th:text="${video.category}">Category</span>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title" th:text="${video.title}">Video Title</h5>
+          <p class="card-text text-truncate" th:text="${video.description}">Video description...</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a th:href="@{/videos/view/{id}(id=${video.id})}" class="btn btn-primary btn-sm">Watch Video</a>
+          <div>
+            <a th:href="@{/videos/toggle-favorite/{id}(id=${video.id})}" class="btn btn-warning btn-sm">
+              <i class="bi bi-star-fill"></i> Remove
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success-color: #10b981;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('/img/robo.jpeg') no-repeat center center/cover;
+            text-align: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(125deg, rgba(99, 102, 241, 0.7), rgba(14, 16, 43, 0.8));
+            backdrop-filter: blur(5px);
+        }
+
+        .glass-effect {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 0;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .glass-1 {
+            top: 10%;
+            left: 15%;
+            width: 100px;
+            height: 100px;
+            animation-delay: 0s;
+        }
+
+        .glass-2 {
+            bottom: 15%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            animation-delay: 2s;
+        }
+
+        .glass-3 {
+            top: 50%;
+            left: 70%;
+            width: 120px;
+            height: 120px;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 1s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .greeting-container {
+            margin-bottom: 30px;
+            padding: 10px;
+            position: relative;
+        }
+
+        .greeting-text {
+            color: var(--light-color);
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid var(--primary-light);
+            width: 0;
+            animation: typing 3.5s steps(30, end) forwards, blink 0.8s infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: var(--primary-light); }
+        }
+
+        h2 {
+            color: var(--light-color);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            height: 3px;
+            width: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        h2:hover::after {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+            text-align: left;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 16px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label {
+            top: -12px;
+            left: 10px;
+            font-size: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-light);
+            padding: 0 8px;
+            border-radius: 4px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light-color);
+            font-size: 15px;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: transparent;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 20px;
+            top: 16px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--light-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            z-index: 1;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: -1;
+            transition: width 0.5s ease;
+        }
+
+        button:hover::before {
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .remember-me input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: var(--light-color);
+            text-decoration: underline;
+        }
+
+        p.signup-text {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            position: relative;
+        }
+
+        p.signup-text::before,
+        p.signup-text::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 25%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        p.signup-text::before {
+            left: 0;
+        }
+
+        p.signup-text::after {
+            right: 0;
+        }
+
+        a.signup-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-left: 5px;
+        }
+
+        a.signup-link:hover {
+            color: var(--light-color);
+            text-decoration: underline;
+        }
+
+        #error-message {
+            color: #ff5e5b;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 94, 91, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: left;
+            border-left: 3px solid #ff5e5b;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light-color);
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-light);
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Floating glass effect elements -->
+<div class="glass-effect glass-1"></div>
+<div class="glass-effect glass-2"></div>
+<div class="glass-effect glass-3"></div>
+
+<div class="container">
+    <!-- Greeting Section -->
+    <div class="greeting-container">
+        <div class="greeting-text">
+            Welcome back!
+        </div>
+    </div>
+
+    <h2>Login</h2>
+
+    <!-- Error Message -->
+    <div id="error-message" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/auth/login}" method="post">
+        <div class="form-group">
+            <input type="email" name="email" id="email" required />
+            <label for="email">Email Address</label>
+        </div>
+        <div class="form-group">
+            <input type="password" name="password" id="password" required />
+            <label for="password">Password</label>
+            <span class="password-toggle" id="togglePassword">
+                    <i class="far fa-eye"></i>
+                </span>
+        </div>
+
+        <div class="login-footer">
+            <div class="remember-me">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Remember me</label>
+            </div>
+            <a href="http://localhost:63342/bigprojects/templates/resetPassword.html?_ijt=6fqv2ob7r9786329f8js373ghp&_ij_reload=RELOAD_ON_SAVE" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <button type="submit">Login</button>
+
+        <p class="signup-text">Or continue with</p>
+
+        <div class="social-login">
+            <a href="#" class="social-btn">
+                <i class="fab fa-google"></i>
+            </a>
+            <a href="#" class="social-btn">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-btn">
+                <i class="fab fa-apple"></i>
+            </a>
+        </div>
+
+        <p class="signup-text">Don't have an account?<a th:href="@{/auth/signup}" class="signup-link">Sign up</a></p>
+    </form>
+</div>
+
+<script>
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+
+        // Toggle icon
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+</script>
+</body>
+</html>
